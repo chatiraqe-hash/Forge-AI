@@ -28,7 +28,7 @@ def get_template(template_name):
             "error": "Template not found"
         }), 404
 
-    content = template_path.read_text(encoding="utf-8")
+    content = template_path.read_text(encoding="utf-8-sig")
 
     return jsonify({
         "template": template_name,
