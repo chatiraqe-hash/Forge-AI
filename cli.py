@@ -2,7 +2,7 @@
 from plugins.logger_plugin import log_export, log_generation
 from plugins.registry import register_plugin
 from template_engine_v2 import generate_project
-from template_registry.loader import list_templates
+from template_registry.search import search_templates
 
 
 register_plugin("before_generate", log_generation)
@@ -10,16 +10,24 @@ register_plugin("before_export", log_export)
 
 
 def main() -> None:
-    templates = list_templates()
+    print("\n=== Forge AI Marketplace ===\n")
 
-    print("\n=== Forge AI Runtime ===\n")
+    templates = search_templates()
+
+    for index, template in enumerate(templates, start=1):
+        print(
+            f"{index}. "
+            f"{template['name']} | "
+            f"{template['stack']} | "
+            f"{template['category']}"
+        )
 
     selected_template = templates[0]
 
     project = generate_project(
         selected_template["manifest_path"],
         {
-            "PROJECT_NAME": "forge-runtime",
+            "PROJECT_NAME": "forge-marketplace",
             "BOT_NAME": "forge_bot",
         },
     )
