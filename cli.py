@@ -3,6 +3,7 @@ from plugins.logger_plugin import log_export, log_generation
 from plugins.registry import register_plugin
 from template_engine_v2 import generate_project
 from template_registry.search import search_templates
+from template_registry.version_manager import find_upgrade
 
 
 register_plugin("before_generate", log_generation)
@@ -19,15 +20,24 @@ def main() -> None:
             f"{index}. "
             f"{template['name']} | "
             f"{template['stack']} | "
-            f"{template['category']}"
+            f"{template['category']} | "
+            f"v{template['version']}"
         )
+
+    upgrade = find_upgrade(
+        {"id": "telegram-bot", "version": "1.0.0"},
+        templates,
+    )
+
+    print("\nUpgrade Check:")
+    print(upgrade)
 
     selected_template = templates[0]
 
     project = generate_project(
         selected_template["manifest_path"],
         {
-            "PROJECT_NAME": "forge-marketplace",
+            "PROJECT_NAME": "forge-versioned",
             "BOT_NAME": "forge_bot",
         },
     )
