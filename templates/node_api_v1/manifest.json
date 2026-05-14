@@ -1,0 +1,24 @@
+{
+  "id": "node-api",
+  "name": "Node API",
+  "version": "1.0.0",
+  "category": "backend",
+  "stack": "node-express",
+  "description": "Express API template",
+  "author": "Forge AI",
+  "entrypoint": "server.js",
+  "variables": [
+    {
+      "name": "PROJECT_NAME",
+      "type": "string",
+      "required": true,
+      "default": "node-api"
+    },
+    {
+      "name": "PORT",
+      "type": "number",
+      "required": true,
+      "default": 3000
+    }
+  ]
+}

@@ -1,33 +1,19 @@
-﻿from exporter import export_project
-from template_engine_v2 import generate_project
-from template_registry.loader import list_templates
+﻿from template_registry.loader import list_templates
+from template_registry.resolver import load_manifest
 
 
 def main() -> None:
     templates = list_templates()
 
-    print("\n=== Forge AI Template Registry ===\n")
+    print("\n=== Forge AI Registry Validation ===\n")
 
-    for index, template in enumerate(templates, start=1):
-        print(f"{index}. {template['name']} ({template['version']})")
+    for template in templates:
+        manifest = load_manifest(template["manifest_path"])
 
-    selected_template = templates[0]
-
-    project = generate_project(
-        selected_template["manifest_path"],
-        {
-            "PROJECT_NAME": "forge-production",
-            "BOT_NAME": "forge_bot",
-        },
-    )
-
-    archive = export_project(str(project))
-
-    print("\nProject Generated:")
-    print(project)
-
-    print("\nZIP Export:")
-    print(archive)
+        print(f"Template: {manifest['name']}")
+        print(f"Stack: {manifest['stack']}")
+        print(f"Entrypoint: {manifest['entrypoint']}")
+        print("-" * 40)
 
 
 if __name__ == "__main__":

@@ -1,5 +1,5 @@
 {
-  "registry_version": "1.0.0",
+  "registry_version": "1.1.0",
   "templates": [
     {
       "id": "telegram-bot",
@@ -8,6 +8,22 @@
       "category": "bot",
       "stack": "python-flask",
       "manifest_path": "templates/telegram_bot_v2/manifest.json"
+    },
+    {
+      "id": "node-api",
+      "name": "Node API",
+      "version": "1.0.0",
+      "category": "backend",
+      "stack": "node-express",
+      "manifest_path": "templates/node_api_v1/manifest.json"
+    },
+    {
+      "id": "nextjs-app",
+      "name": "Next.js App",
+      "version": "1.0.0",
+      "category": "frontend",
+      "stack": "nextjs",
+      "manifest_path": "templates/nextjs_app_v1/manifest.json"
     }
   ],
   "supported_stacks": [

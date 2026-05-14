@@ -1,0 +1,24 @@
+{
+  "id": "nextjs-app",
+  "name": "Next.js App",
+  "version": "1.0.0",
+  "category": "frontend",
+  "stack": "nextjs",
+  "description": "Next.js starter application",
+  "author": "Forge AI",
+  "entrypoint": "app/page.tsx",
+  "variables": [
+    {
+      "name": "PROJECT_NAME",
+      "type": "string",
+      "required": true,
+      "default": "nextjs-app"
+    },
+    {
+      "name": "APP_NAME",
+      "type": "string",
+      "required": true,
+      "default": "Forge App"
+    }
+  ]
+}
