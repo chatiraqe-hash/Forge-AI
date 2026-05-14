@@ -18,7 +18,17 @@ def list_templates():
     ]
 
 
-def generate_template(template_name, output_name):
+def apply_variables(content, variables):
+    for key, value in variables.items():
+        placeholder = "{{" + key + "}}"
+        content = content.replace(placeholder, str(value))
+
+    return content
+
+
+def generate_template(template_name, output_name, variables=None):
+    variables = variables or {}
+
     template_path = TEMPLATES_DIR / template_name
 
     if not template_path.exists():
@@ -28,7 +38,11 @@ def generate_template(template_name, output_name):
 
     output_path = GENERATED_DIR / output_name
 
-    shutil.copy(template_path, output_path)
+    content = template_path.read_text(encoding="utf-8-sig")
+
+    final_content = apply_variables(content, variables)
+
+    output_path.write_text(final_content, encoding="utf-8")
 
     return {
         "template": template_name,
