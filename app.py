@@ -1,4 +1,4 @@
-from flask import Flask, jsonify, request
+﻿from flask import Flask, jsonify, request
 from pathlib import Path
 from template_engine import list_templates, generate_template
 
@@ -43,6 +43,7 @@ def generate():
 
     template_name = data.get("template")
     output_name = data.get("output")
+    variables = data.get("variables", {})
 
     if not template_name or not output_name:
         return jsonify({
@@ -50,8 +51,14 @@ def generate():
         }), 400
 
     try:
-        result = generate_template(template_name, output_name)
+        result = generate_template(
+            template_name,
+            output_name,
+            variables
+        )
+
         return jsonify(result)
+
     except FileNotFoundError:
         return jsonify({
             "error": "Template not found"
