@@ -1,6 +1,7 @@
 ﻿from pathlib import Path
 import json
 import shutil
+import zipfile
 
 BASE_DIR = Path(__file__).parent
 
@@ -62,7 +63,14 @@ def validate_template(template_name):
         }
 
     metadata = load_metadata(template_name)
-    required = ["name", "version", "stack", "category", "required_variables"]
+
+    required = [
+        "name",
+        "version",
+        "stack",
+        "category",
+        "required_variables"
+    ]
 
     for key in required:
         if key not in metadata:
@@ -86,6 +94,7 @@ def generate_template(template_name, output_name, variables=None):
     files_dir = template_dir / "files"
 
     metadata = load_metadata(template_name)
+
     required_variables = metadata.get("required_variables", [])
 
     missing_variables = [
@@ -124,3 +133,23 @@ def generate_template(template_name, output_name, variables=None):
         "output": str(output_dir),
         "metadata": metadata
     }
+
+
+def export_zip(project_name):
+    project_dir = GENERATED_DIR / project_name
+
+    if not project_dir.exists():
+        raise FileNotFoundError("Generated project not found")
+
+    zip_path = GENERATED_DIR / f"{project_name}.zip"
+
+    if zip_path.exists():
+        zip_path.unlink()
+
+    with zipfile.ZipFile(zip_path, "w", zipfile.ZIP_DEFLATED) as zipf:
+        for file_path in project_dir.rglob("*"):
+            if file_path.is_file():
+                arcname = file_path.relative_to(project_dir)
+                zipf.write(file_path, arcname)
+
+    return str(zip_path)

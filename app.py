@@ -1,10 +1,17 @@
-﻿from flask import Flask, jsonify, request
+﻿from flask import Flask, jsonify, request, send_file
 from pathlib import Path
-from template_engine import list_templates, generate_template
+
+from template_engine import (
+    list_templates,
+    generate_template,
+    validate_template,
+    export_zip
+)
 
 app = Flask(__name__)
 
 TEMPLATES_DIR = Path(__file__).parent / "templates"
+
 
 @app.route("/")
 def home():
@@ -13,29 +20,18 @@ def home():
         "phase": "Phase 3"
     })
 
+
 @app.route("/templates")
 def templates():
     return jsonify({
         "templates": list_templates()
     })
 
-@app.route("/templates/<path:template_name>")
-def get_template(template_name):
-    template_path = (TEMPLATES_DIR / template_name).resolve()
-    templates_root = TEMPLATES_DIR.resolve()
 
-    if not str(template_path).startswith(str(templates_root)):
-        return jsonify({"error": "Invalid template path"}), 400
+@app.route("/templates/<template_name>/validate")
+def validate(template_name):
+    return jsonify(validate_template(template_name))
 
-    if not template_path.exists() or not template_path.is_file():
-        return jsonify({"error": "Template not found"}), 404
-
-    content = template_path.read_text(encoding="utf-8-sig")
-
-    return jsonify({
-        "template": template_name,
-        "content": content
-    })
 
 @app.route("/generate", methods=["POST"])
 def generate():
@@ -63,6 +59,31 @@ def generate():
         return jsonify({
             "error": "Template not found"
         }), 404
+
+    except KeyError as e:
+        return jsonify({
+            "error": "Missing variables",
+            "missing": list(e.args[0])
+        }), 400
+
+    except ValueError as e:
+        return jsonify({
+            "error": "Validation failed",
+            "details": str(e)
+        }), 400
+
+
+@app.route("/export/<project_name>")
+def export(project_name):
+    try:
+        zip_path = export_zip(project_name)
+        return send_file(zip_path, as_attachment=True)
+
+    except FileNotFoundError:
+        return jsonify({
+            "error": "Project not found"
+        }), 404
+
 
 if __name__ == "__main__":
     app.run(debug=True)
