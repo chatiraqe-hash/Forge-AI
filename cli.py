@@ -1,33 +1,18 @@
-﻿import argparse
+﻿from template_registry.loader import list_templates
 
-from template_engine import (
-    generate_template,
-    export_zip
-)
 
-parser = argparse.ArgumentParser()
+def main() -> None:
+    templates = list_templates()
 
-parser.add_argument("--template", required=True)
-parser.add_argument("--output", required=True)
-parser.add_argument("--project")
-parser.add_argument("--bot")
+    print("\n=== Forge AI Template Registry ===\n")
 
-args = parser.parse_args()
+    for template in templates:
+        print(f"Name: {template['name']}")
+        print(f"ID: {template['id']}")
+        print(f"Version: {template['version']}")
+        print(f"Stack: {template['stack']}")
+        print("-" * 40)
 
-variables = {
-    "PROJECT_NAME": args.project or "Forge AI Project",
-    "BOT_NAME": args.bot or "ForgeBot"
-}
 
-result = generate_template(
-    args.template,
-    args.output,
-    variables
-)
-
-zip_path = export_zip(args.output)
-
-print(result)
-print({
-    "zip": zip_path
-})
+if __name__ == "__main__":
+    main()

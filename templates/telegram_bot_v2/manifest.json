@@ -1,0 +1,24 @@
+{
+  "id": "telegram-bot",
+  "name": "Telegram Bot",
+  "version": "2.0.0",
+  "category": "bot",
+  "stack": "python-flask",
+  "description": "Telegram bot template powered by Flask and Groq",
+  "author": "Forge AI",
+  "entrypoint": "app.py",
+  "variables": [
+    {
+      "name": "PROJECT_NAME",
+      "type": "string",
+      "required": true,
+      "default": "forge-project"
+    },
+    {
+      "name": "BOT_NAME",
+      "type": "string",
+      "required": true,
+      "default": "forge_bot"
+    }
+  ]
+}

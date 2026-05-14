@@ -1,0 +1,25 @@
+{
+  "schema_version": "2.0.0",
+  "required_fields": [
+    "id",
+    "name",
+    "version",
+    "category",
+    "stack",
+    "description",
+    "author",
+    "entrypoint",
+    "variables"
+  ],
+  "variable_schema": {
+    "name": "string",
+    "type": "string",
+    "required": "boolean",
+    "default": "any"
+  },
+  "supported_variable_types": [
+    "string",
+    "number",
+    "boolean"
+  ]
+}
