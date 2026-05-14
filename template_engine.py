@@ -1,5 +1,6 @@
-﻿from pathlib import Path
+from pathlib import Path
 import json
+import requests
 import shutil
 import zipfile
 
@@ -7,6 +8,7 @@ BASE_DIR = Path(__file__).parent
 
 TEMPLATES_DIR = BASE_DIR / "templates"
 GENERATED_DIR = BASE_DIR / "generated"
+GITHUB_TEMPLATES_API = "https://api.github.com/repos/chatiraqe-hash/templates/contents"
 
 
 def list_templates():
