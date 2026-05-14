@@ -1,4 +1,5 @@
 ﻿from pathlib import Path
+import json
 import shutil
 
 BASE_DIR = Path(__file__).parent
@@ -11,11 +12,23 @@ def list_templates():
     if not TEMPLATES_DIR.exists():
         return []
 
-    return [
-        item.name
-        for item in TEMPLATES_DIR.iterdir()
-        if item.is_file()
-    ]
+    templates = []
+
+    for item in TEMPLATES_DIR.iterdir():
+        if item.is_dir() and (item / "template.json").exists():
+            metadata = load_metadata(item.name)
+            templates.append(metadata)
+
+    return templates
+
+
+def load_metadata(template_name):
+    metadata_path = TEMPLATES_DIR / template_name / "template.json"
+
+    if not metadata_path.exists():
+        raise FileNotFoundError("Template metadata not found")
+
+    return json.loads(metadata_path.read_text(encoding="utf-8-sig"))
 
 
 def apply_variables(content, variables):
@@ -26,25 +39,88 @@ def apply_variables(content, variables):
     return content
 
 
+def validate_template(template_name):
+    template_dir = TEMPLATES_DIR / template_name
+    metadata_path = template_dir / "template.json"
+    files_dir = template_dir / "files"
+
+    errors = []
+
+    if not template_dir.exists():
+        errors.append("Template directory not found")
+
+    if not metadata_path.exists():
+        errors.append("template.json is missing")
+
+    if not files_dir.exists():
+        errors.append("files directory is missing")
+
+    if errors:
+        return {
+            "valid": False,
+            "errors": errors
+        }
+
+    metadata = load_metadata(template_name)
+    required = ["name", "version", "stack", "category", "required_variables"]
+
+    for key in required:
+        if key not in metadata:
+            errors.append(f"metadata missing: {key}")
+
+    return {
+        "valid": len(errors) == 0,
+        "errors": errors
+    }
+
+
 def generate_template(template_name, output_name, variables=None):
     variables = variables or {}
 
-    template_path = TEMPLATES_DIR / template_name
+    validation = validate_template(template_name)
 
-    if not template_path.exists():
-        raise FileNotFoundError("Template not found")
+    if not validation["valid"]:
+        raise ValueError(validation["errors"])
+
+    template_dir = TEMPLATES_DIR / template_name
+    files_dir = template_dir / "files"
+
+    metadata = load_metadata(template_name)
+    required_variables = metadata.get("required_variables", [])
+
+    missing_variables = [
+        key for key in required_variables
+        if key not in variables
+    ]
+
+    if missing_variables:
+        raise KeyError(missing_variables)
 
     GENERATED_DIR.mkdir(exist_ok=True)
 
-    output_path = GENERATED_DIR / output_name
+    output_dir = GENERATED_DIR / output_name
 
-    content = template_path.read_text(encoding="utf-8-sig")
+    if output_dir.exists():
+        shutil.rmtree(output_dir)
 
-    final_content = apply_variables(content, variables)
+    output_dir.mkdir(parents=True, exist_ok=True)
 
-    output_path.write_text(final_content, encoding="utf-8")
+    for source_path in files_dir.rglob("*"):
+        if source_path.is_dir():
+            continue
+
+        relative_path = source_path.relative_to(files_dir)
+        target_path = output_dir / relative_path
+
+        target_path.parent.mkdir(parents=True, exist_ok=True)
+
+        content = source_path.read_text(encoding="utf-8-sig")
+        final_content = apply_variables(content, variables)
+
+        target_path.write_text(final_content, encoding="utf-8")
 
     return {
         "template": template_name,
-        "output": str(output_path)
+        "output": str(output_dir),
+        "metadata": metadata
     }

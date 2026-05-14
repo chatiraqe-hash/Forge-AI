@@ -1,0 +1,7 @@
+﻿{
+  "name": "Telegram Bot",
+  "version": "1.0.0",
+  "stack": ["Python", "Flask", "Groq", "Telegram"],
+  "category": "bot",
+  "required_variables": ["PROJECT_NAME", "BOT_NAME"]
+}
