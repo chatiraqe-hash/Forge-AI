@@ -19,11 +19,17 @@ def templates():
         "templates": list_templates()
     })
 
-@app.route("/templates/<template_name>")
+@app.route("/templates/<path:template_name>")
 def get_template(template_name):
-    template_path = TEMPLATES_DIR / template_name
+    template_path = (TEMPLATES_DIR / template_name).resolve()
+    templates_root = TEMPLATES_DIR.resolve()
 
-    if not template_path.exists():
+    if not str(template_path).startswith(str(templates_root)):
+        return jsonify({
+            "error": "Invalid template path"
+        }), 400
+
+    if not template_path.exists() or not template_path.is_file():
         return jsonify({
             "error": "Template not found"
         }), 404
